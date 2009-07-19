@@ -21,6 +21,7 @@ import urlparse
 from rdfalchemy import rdfSubject, rdfsSubject, rdfSingle, rdfMultiple
 from rdfalchemy.orm import mapper
 import hashlib
+import json
 
 DC = Namespace('http://purl.org/dc/terms/')
 BIBO = Namespace('http://purl.org/ontology/bibo/')
@@ -79,6 +80,36 @@ class Document(rdfSubject):
     authorList = rdfMultiple(BIBO.authorList)
     subjects = rdfMultiple(DC.subject, range_type=SKOS.Concept)
     content = rdfSingle(BIBO.content)
+
+    def to_json(self):
+        
+        ignore = [ "ClassInstances",
+                   "GetRandom",
+                   "db",
+                   "filter_by",
+                   "get_by",
+                   "md5_term_hash",
+                   "n3",
+                   "query",
+                   "rdf_type",
+                   "to_json",
+                   "resUri"
+                   ]
+
+        c = {}
+
+        for i in dir(self):
+            if i in ignore or i.startswith("_") or i.startswith("http://"):
+                pass
+            else:
+                if self.__getattribute__(i):
+                    c[i] = self.__getattribute__(i)
+
+        if self.resUri and self.resUri.startswith("http://"):
+            c['uri'] = self.resUri
+
+        return(json.dumps(c, sort_keys=True, indent=2))
+
     
     def __cmp__(self, other):
         """
@@ -102,12 +133,12 @@ class Article(Document):
     pages = rdfSingle(BIBO.pages)
     page_start = rdfSingle(BIBO.pageStart)
     page_end = rdfSingle(BIBO.pageEnd)
+    doi = rdfSingle(BIBO.doi)
     periodical = rdfSingle(DC.isPartOf, range_type=BIBO.Periodical)
 
 class AcademicArticle(Article):
     rdf_type = BIBO.AcademicArticle
     peer_reviewed = rdfSingle(BIBO.peerReviewed)
-    doi = rdfSingle(BIBO.doi)
 
 class Periodical(rdfSubject):
     rdf_type = BIBO.Periodical
