@@ -239,6 +239,11 @@ class Agent(rdfSubject):
     mbox_sha1sum = gen_mbox_sha1sum(str(mbox))
     based_near = rdfSingle(FOAF.based_near, range_type=GEONAMES.Feature)
 
+    def to_json(self):
+        # this is wrong; can't figure out how to get the linked agent
+        # to_json correctly (from Document)
+        return({'name': self.name})
+
 class Person(Agent):
     rdf_type = FOAF.Person
     interests = rdfMultiple(FOAF.interest, range_type=SKOS.Concept)
