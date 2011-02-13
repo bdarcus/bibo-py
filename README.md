@@ -1,4 +1,4 @@
-= Introduction = 
+# Introduction
 
 PyBibo provdides an RDF-Object mapping for bibliographic 
 data. It includes mappings for key classes and related 
